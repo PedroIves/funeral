@@ -3,58 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Câmera Ao Vivo - Fácil</title>
+    <title>Câmera Ao Vivo - Super Fácil</title>
     <style>
         body, html {
             margin: 0;
             padding: 0;
             height: 100%;
-            overflow: hidden;
-            background-color: #f0f0f0;
+            background-color: #f4f4f4; /* Cor de fundo suave */
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            font-family: sans-serif;
+            justify-content: center; /* Centraliza verticalmente */
+            font-family: Arial, sans-serif; /* Fonte mais legível */
+            min-height: 100vh; /* Garante altura mínima */
+            padding-bottom: 20px; /* Espaço no final */
         }
+        h1 {
+            color: #333;
+            margin-bottom: 20px; /* Mais espaço abaixo do título */
+            font-size: 2em; /* Título maior */
+            text-align: center;
+         }
         #container-video {
-            width: 90%; /* Largura do container */
-            max-width: 1000px; /* Largura máxima */
-            height: 70vh; /* Altura do container */
-            border: 1px solid #ccc;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            margin-bottom: 15px; /* Espaço para o botão abaixo */
-            position: relative; /* Necessário para posicionar o iframe corretamente */
+            width: 90%;
+            max-width: 800px; /* Limita largura máxima */
+            /* Ajuste a altura como % da LARGURA (aspect ratio 16:9) */
+            aspect-ratio: 16 / 9;
+            background-color: #000; /* Fundo preto para parecer player */
+            border: 2px solid #ccc;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+            margin-bottom: 25px; /* Mais espaço para o botão */
+            position: relative;
         }
         iframe {
+            display: block; /* Remove espaço extra abaixo */
             width: 100%;
             height: 100%;
             border: none;
         }
-        #fullscreen-button {
-            padding: 15px 30px;
-            font-size: 1.2em;
+        #start-fullscreen-button {
+            padding: 20px 40px; /* Botão bem grande */
+            font-size: 1.5em; /* Texto do botão maior */
             cursor: pointer;
-            background-color: #007bff;
+            background-color: #28a745; /* Verde (mais convidativo) */
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 10px; /* Cantos arredondados */
             font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: background-color 0.2s;
+            margin-top: 10px; /* Espaço acima */
         }
-         h1 {
-            color: #333;
-            margin-bottom: 15px;
-            text-align: center;
-         }
-         p.instrucao {
-             margin-top: 10px;
+        #start-fullscreen-button:hover {
+            background-color: #218838; /* Verde mais escuro */
+        }
+        .instructions {
+             margin-top: 20px;
              color: #555;
+             font-size: 1.1em; /* Instruções maiores */
              text-align: center;
+             max-width: 600px; /* Limita largura das instruções */
+             line-height: 1.6; /* Melhor espaçamento entre linhas */
+         }
+         .instructions strong {
+             color: #007bff; /* Destaca partes importantes */
          }
     </style>
 </head>
 <body>
-    <h1>Visualização da Câmera</h1>
+    <h1>Câmera Ao Vivo</h1>
+
     <div id="container-video">
         <iframe id="video-iframe"
                 src="https://delaysp01.logicahost.com.br:5443/grupomorada/play.html?name=MoraPeCap01"
@@ -63,30 +81,44 @@
         </iframe>
     </div>
 
-    <button id="fullscreen-button">Ver em Tela Cheia</button>
-    <p class="instrucao">O vídeo deve começar sozinho (sem som). Clique no botão acima para ampliar.</p>
-    <p class="instrucao">(Dentro do vídeo também pode haver um botão de tela cheia [])</p>
+    <!-- Botão principal para TELA CHEIA -->
+    <button id="start-fullscreen-button">📺 Ver em Tela Cheia</button>
+
+    <div class="instructions">
+        <p><strong>Passo 1:</strong> Clique no botão verde <strong>"Ver em Tela Cheia"</strong> acima.</p>
+        <p><strong>Passo 2:</strong> O vídeo pode começar sozinho (sem som). Se não começar ou se quiser som, <strong>clique no meio da tela</strong> do vídeo (depois que ela ficar grande).</p>
+        <p>(Pode aparecer um botão de Play ▶️ ou um ícone de som 🔊 dentro do vídeo para clicar).</p>
+    </div>
 
     <script>
-        const fullscreenButton = document.getElementById('fullscreen-button');
-        const videoContainer = document.getElementById('container-video'); // Vamos colocar o container em tela cheia
+        const fullscreenButton = document.getElementById('start-fullscreen-button');
+        const videoContainer = document.getElementById('container-video');
 
         fullscreenButton.addEventListener('click', () => {
+            console.log("Botão Tela Cheia clicado. Tentando colocar container em fullscreen.");
+            // A única ação confiável que podemos fazer: pedir tela cheia para o container
             if (videoContainer.requestFullscreen) {
-                videoContainer.requestFullscreen();
+                videoContainer.requestFullscreen().catch(err => console.error(`Erro ao entrar em tela cheia: ${err.message}`));
             } else if (videoContainer.webkitRequestFullscreen) { /* Safari */
-                videoContainer.webkitRequestFullscreen();
+                videoContainer.webkitRequestFullscreen().catch(err => console.error(`Erro ao entrar em tela cheia (webkit): ${err.message}`));
             } else if (videoContainer.msRequestFullscreen) { /* IE11 */
                 videoContainer.msRequestFullscreen();
+            } else {
+                 alert("Não foi possível ativar a Tela Cheia neste navegador.");
             }
+
+            // NÃO PODEMOS controlar play/som dentro do iframe a partir daqui.
+            // O usuário precisará interagir com o conteúdo do iframe.
         });
 
-        // Tenta focar o iframe para talvez ajudar no autoplay em alguns casos
-        // window.onload = () => {
-        //    document.getElementById('video-iframe').focus();
-        // };
-        // Nota: Focar pode não ter efeito prático no autoplay devido às restrições do navegador.
-        // O 'allow="autoplay"' é a parte mais importante.
+         // Opcional: Adicionar listener para saber quando saiu da tela cheia
+        document.addEventListener('fullscreenchange', () => {
+          if (!document.fullscreenElement) {
+            console.log('Saiu do modo Tela Cheia.');
+            // Poderia reativar o botão ou fazer algo se necessário
+          }
+        });
+
     </script>
 </body>
 </html>
